@@ -1,0 +1,4 @@
+To
+1. Run a LAMMPS script: {PATH_TO_LMP_SERIAL} -in <nvt_filename>                 # script-NVT in this case
+2. Extract a package: tar -xzvf <package_name>                                  # lammps.tar.gz in this case
+    {ALL TAR COMMANDS} https://linuxize.com/post/how-to-create-and-extract-archives-using-the-tar-command-in-linux/

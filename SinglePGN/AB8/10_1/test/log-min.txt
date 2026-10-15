@@ -1,0 +1,129 @@
+include forcefield.lmp
+########################################################
+# Start of charge, pairs, and long range interactions
+########################################################
+set type 1 charge 0
+Setting atom values ...
+  1 settings made for charge
+set type 2 charge 1
+Setting atom values ...
+  8 settings made for charge
+pair_style lj/cut/coul/long 8 10
+kspace_style pppm 1.0e-4
+
+pair_coeff 1 1 1.0 10.0 10.0 # Nanoparticle O
+pair_coeff 1 2 1.0 5.5 5.5 # O-P
+pair_coeff 2 2 1.0 1.0 1.0 # Polymer P
+pair_modify shift yes
+
+special_bonds lj 0.0 1.0 1.0
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        1        1       
+  special bond factors coul:  0        0        0       
+     8 = max # of 1-2 neighbors
+     7 = max # of 1-3 neighbors
+     7 = max # of 1-4 neighbors
+     8 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+special_bonds coul 0.0 1.0 1.0
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0       
+  special bond factors coul:  0        1        1       
+     8 = max # of 1-2 neighbors
+     7 = max # of 1-3 neighbors
+     7 = max # of 1-4 neighbors
+     8 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+###################################
+# Start of bonded interactions
+###################################
+bond_style harmonic
+angle_style harmonic
+bond_coeff 1 100 5.5	# O-P
+angle_coeff * 0 180	# all angle types
+
+#groups
+group g1 molecule 2
+0 atoms in group g1
+group free subtract all g1
+9 atoms in group free
+
+# Input parameter initialisation
+neigh_modify every 1 delay 0 check yes page 100000 one 5000
+dielectric 0.5
+
+# Minimization first to fix overlapping atoms
+minimize 1.0e-4 1.0e-6 10 10
+PPPM initialization ...
+WARNING: System is not charge neutral, net charge = 8 (../kspace.cpp:327)
+  using 12-bit tables for long-range coulomb (../kspace.cpp:342)
+  G vector (1/distance) = 0.24126287
+  grid = 12 12 12
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.02858589
+  estimated relative force accuracy = 8.6085558e-05
+  using double precision KISS FFT
+  3d grid and FFT values/proc = 4913 1728
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 5000, page size: 100000
+  master list distance cutoff = 12
+  ghost atom cutoff = 12
+  binsize = 6, bins = 5 5 5
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut/coul/long, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 16.29 | 16.29 | 16.29 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   0              482.03871      2.7904239      484.82913      68.941732    
+         7   0              418.03441      39.327106      457.36151     -1258.4757    
+Loop time of 0.0017084 on 1 procs for 7 steps with 9 atoms
+
+50.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+Minimization stats:
+  Stopping criterion = max force evaluations
+  Energy initial, next-to-last, final = 
+      484.829132456153   457.554868598751   457.361511999193
+  Force two-norm initial, final = 104.84131 5.1896322
+  Force max component initial, final = 39.050224 1.9512945
+  Final line search alpha, max atom move = 0.0073841876 0.014408725
+  Iterations, force evaluations = 7 11
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 1.4297e-05 | 1.4297e-05 | 1.4297e-05 |   0.0 |  0.84
+Bond    | 2.2491e-05 | 2.2491e-05 | 2.2491e-05 |   0.0 |  1.32
+Kspace  | 0.001653   | 0.001653   | 0.001653   |   0.0 | 96.76
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 3.528e-06  | 3.528e-06  | 3.528e-06  |   0.0 |  0.21
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 1.508e-05  |            |       |  0.88
+
+Nlocal:              9 ave           9 max           9 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:             12 ave          12 max          12 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:             36 ave          36 max          36 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 36
+Ave neighs/atom = 4
+Ave special neighs/atom = 8
+Neighbor list builds = 0
+Dangerous builds = 0
+
+# Reset velocity after minimization
+velocity all create 1.0 4928459 rot yes dist gaussian
+
+# Fix double thermostat - g1 only thermostated by fix 2
+fix 1 all nvt temp 1.0 1.0 100.0
+fix 2 g1 rigid/nvt molecule temp 1.0 1.0 1.0
+ERROR: No rigid bodies defined (../fix_rigid.cpp:261)
+Last command: fix 2 g1 rigid/nvt molecule temp 1.0 1.0 1.0

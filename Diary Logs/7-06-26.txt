@@ -1,0 +1,17 @@
+AB2 (Ng = 2, N = 10)
+ Bonds between monomers became very much elongated on decreasing bond coefficient from 100 to 1.
+ Monomers bond coefficient = 100 => grafting bond distance = 4.33 (elongated from 4.25), maximum monomer bond distance = 1.14 (elongated from 1.00).
+Only bonds between charged monomers elongated. Newtral monomers placed accurately.
+QUE: How to minimize elongation??
+(200, 200) => 4.17,1.05
+(100, 150) => 4.32,1.10
+(150, 175) => 4.30,1.09
+(175, 200) => 4.17,1.05
+(165, 225) => 4.30,1.07
+(170, 250) => 4.30,1.06
+No scope of improvement??
+Total energy just negative for 4.30, just positive for 4.17.
+(200, 400) => 4.30,1.04
+(500, 1000) => 4.25,1.01
+This is much better.
+AB2 (Ng = 2, N = 16)

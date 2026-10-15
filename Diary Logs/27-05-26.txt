@@ -1,0 +1,9 @@
+1. Polymer bond length = 1.03 
+2. Running NVT only on grafts -> Grafts merging to only two sites.
+3. For AB10 type molecules, with charge 1, also the problem of elongated distance arises.
+4. pair_style lj/cut/coul/long and kspace_style pppm -> Only for charged particles.
+    For uncharged particles, only lj/cut 
+5. Working perfectly for uncharged monomers. Intermolecular distances increased for charged molecules.
+6. How to give lj/cut values: 
+        lj/cut value = 2.5 typically
+        pair_coeff value = lj/cut value * dia

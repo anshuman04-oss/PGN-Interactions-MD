@@ -1,0 +1,23 @@
+Changed bond style from harmonic to fene.
+One part O-P bond accurate, other part compressed.
+One part: 4.25->4.25, other: 4.25->3.20
+P-P bonds compressed equally at every part,
+P-P: 1.0->0.9
+I had not applied rigid part initially
+Noe O-P bond lengths consistent, but P-P bonds still shortened
+
+Tried to equiibritate grafts first then grow polymer on top of that, but got shortened lengths of the grafts themselves.
+
+Changing k values:
+100: shorter
+10: shorter
+0: longer
+1: shorter
+.5: longer
+.75: closest
+.65: accurate.
+
+Ran free nvt on the AB3 molecule with length 16.
+Shorter O-P lengths, inconsistent P-P lengths.
+
+FENE bonds turning out to be even more annoying. Will just leave it here

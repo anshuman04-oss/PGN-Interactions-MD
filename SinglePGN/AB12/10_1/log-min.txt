@@ -1,0 +1,154 @@
+include forcefield.lmp
+########################################################
+# Start of charge, pairs, and long range interactions
+########################################################
+set type 1 charge 0
+Setting atom values ...
+  1 settings made for charge
+set type 2 charge 0
+Setting atom values ...
+  360 settings made for charge
+pair_style lj/cut 2.5
+#kspace_style pppm 1.0e-4
+
+# pair_coeff I J Epsilon Sigma cutoff (lj/cut * sigma)
+pair_coeff 1 1 1.0 10.0 25 # Nanoparticle O
+pair_coeff 1 2 1.0 5.5 13.75 # O-P
+pair_coeff 2 2 1.0 1.0 2.5 # Polymer P
+pair_modify shift yes
+
+special_bonds lj/coul 0.0 0.0 0.0
+###################################
+# Start of bonded interactions
+###################################
+bond_style harmonic
+angle_style harmonic
+bond_coeff 1 100 5.5	# O-P
+bond_coeff 2 100 1.0	# P-P
+angle_coeff * 5 180	# all angle types
+
+#groups
+group g1 molecule 2
+0 atoms in group g1
+group free subtract all g1
+361 atoms in group free
+
+# Input parameter initialisation
+neigh_modify every 1 delay 0 check yes page 100000 one 5000
+
+# Minimization first to fix overlapping atoms
+minimize 1.0e-4 1.0e-6 10000 100000
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 5000, page size: 100000
+  master list distance cutoff = 27
+  ghost atom cutoff = 27
+  binsize = 13.5, bins = 6 6 6
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 27.33 | 27.33 | 27.33 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   0             -5.9317796      836.5774       830.64562     -2.1939309    
+        35   0             -6.175325       820.94339      814.76806     -12.336362    
+Loop time of 0.0020175 on 1 procs for 35 steps with 361 atoms
+
+0.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+Minimization stats:
+  Stopping criterion = energy tolerance
+  Energy initial, next-to-last, final = 
+      830.645617546309   814.844865266436   814.768060219758
+  Force two-norm initial, final = 36.20613 8.5024451
+  Force max component initial, final = 34.034589 4.505017
+  Final line search alpha, max atom move = 0.026931321 0.12132606
+  Iterations, force evaluations = 35 70
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.00014347 | 0.00014347 | 0.00014347 |   0.0 |  7.11
+Bond    | 0.0013549  | 0.0013549  | 0.0013549  |   0.0 | 67.16
+Neigh   | 0.00018129 | 0.00018129 | 0.00018129 |   0.0 |  8.99
+Comm    | 0.00010302 | 0.00010302 | 0.00010302 |   0.0 |  5.11
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 0.0002348  |            |       | 11.64
+
+Nlocal:            361 ave         361 max         361 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            485 ave         485 max         485 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:            412 ave         412 max         412 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 412
+Ave neighs/atom = 1.1412742
+Ave special neighs/atom = 6.8808864
+Neighbor list builds = 1
+Dangerous builds = 0
+
+# Reset velocity after minimization
+velocity all create 1.0 4928459 rot yes dist gaussian
+
+# Fix double thermostat - g1 only thermostated by fix 2
+fix 1 all nvt temp 1.0 1.0 100.0
+#fix 2 g1 rigid/nvt molecule temp 1.0 1.0 1.0
+
+thermo_style custom step temp press vol density pe ke etotal spcpu
+timestep 0.005
+
+dump 1 all dcd 1000 trajmin.dcd
+dump_modify 1 unwrap yes
+
+run 500000
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Per MPI rank memory allocation (min/avg/max) = 26.21 | 26.21 | 26.21 Mbytes
+   Step          Temp          Press          Volume        Density         PotEng         KinEng         TotEng         S/CPU     
+        35   1             -12.220087      421875         0.0053530855   814.76806      1.0730916      815.84115      0            
+    500035   0.99851678    -1.0364949      421875         0.0053530855   802.41719      1.0715         803.48869      41808.787    
+Loop time of 11.9592 on 1 procs for 500000 steps with 361 atoms
+
+Performance: 18.061 ns/day, 1.329 hours/ns, 41808.742 timesteps/s, 15.093 Matom-step/s
+99.9% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.76747    | 0.76747    | 0.76747    |   0.0 |  6.42
+Bond    | 8.2008     | 8.2008     | 8.2008     |   0.0 | 68.57
+Neigh   | 0.0024182  | 0.0024182  | 0.0024182  |   0.0 |  0.02
+Comm    | 0.6546     | 0.6546     | 0.6546     |   0.0 |  5.47
+Output  | 0.013711   | 0.013711   | 0.013711   |   0.0 |  0.11
+Modify  | 1.9799     | 1.9799     | 1.9799     |   0.0 | 16.56
+Other   |            | 0.3403     |            |       |  2.85
+
+Nlocal:            361 ave         361 max         361 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            467 ave         467 max         467 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:            408 ave         408 max         408 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 408
+Ave neighs/atom = 1.1301939
+Ave special neighs/atom = 6.8808864
+Neighbor list builds = 12
+Dangerous builds = 0
+write_data after.config
+System init for write_data ...
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+WARNING: Not all mixed pair coeffs generated from mixing. Use write_data with 'pair ij' option to store all pair coeffs. (../write_data.cpp:331)
+print " ******* "
+ ******* 
+print " ****** finished NVT run *******"
+ ****** finished NVT run *******
+print " ******* "
+ ******* 
+print "Done"
+Done
+Total wall time: 0:00:11

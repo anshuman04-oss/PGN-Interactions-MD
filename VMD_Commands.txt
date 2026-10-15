@@ -1,0 +1,13 @@
+1. Delete labels and measurements:
+        label delete Atoms all
+        label delete Bonds all
+        label delete Angles all
+        label delete Dihedrals all
+2. Run tcl file for generating config file: source <filename of tcl format>
+3. Move all the molecules by {x y z}:
+        set all [atomselect top all]
+        $all moveby {x y z}
+4. Move the box by {x y z}: pbc box -shiftcenter {x y z}
+5. Write current coordinates: animate write xyz new_system.xyz
+6. Write a restart fild: write_restart <file_name>
+6. Put the whole system inside the box: pbc wrap -compound fragment- all
